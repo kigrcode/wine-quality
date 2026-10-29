@@ -39,6 +39,7 @@ dependencies:
   # Code quality (optional but recommended)
   - black
   - ruff
+  - pytest
 
   # Pip section for packages not on conda-forge
   - pip

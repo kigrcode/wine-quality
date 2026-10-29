@@ -53,6 +53,13 @@ def prepare_data(df: pd.DataFrame, config: dict):
     TARGET = config["target"]
     DROP_COLS = config.get("drop_columns", [])
 
+    # Drop dupes if required
+    if config.get("drop_dupes", False):
+        n_before = len(df)
+        df = df.drop_duplicates().reset_index(drop=True)     
+        removals = n_before - len(df)
+        print(f"{removals} instances have been dropped")
+
     X = df.drop(columns=[TARGET] + DROP_COLS)
     y = df[TARGET]
 
