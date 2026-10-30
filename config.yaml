@@ -11,6 +11,9 @@ target: "good"
 # Columns to drop before modelling (IDs, irrelevant columns etc.)
 drop_columns: ["quality"]
 
+# Set to true to drop duplicate instances if required:
+drop_dupes: true
+
 # Missing value indicators specific to this dataset
 # Note: common string indicators ("?", "name", "n/a" etc.) are
 # handled automatically by load_raw_data.
