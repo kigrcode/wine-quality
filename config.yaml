@@ -101,3 +101,10 @@ binarise_target: false
 feature_type_overrides:
   ordinal: []
   nominal: [] 
+
+# Number of CPU threads for models that parallelise (XGBoost, LightGBM, CatBoost).
+# Leave unset to use each library's default (all available threads).
+# On small datasets, too many threads can be much slower, e.g. 60s vs 0.1s on
+# ~1,000 rows. Lower this on machines with few cores.
+
+n_jobs: 4    
