@@ -6,7 +6,7 @@ from sklearn.ensemble import (
     ExtraTreesRegressor,
 )
 
-# Optional imports — gracefully handled if not installed
+# Optional imports — handled if not installed
 try:
     from xgboost import XGBClassifier, XGBRegressor
     XGBOOST_AVAILABLE = True
@@ -173,3 +173,4 @@ if CATBOOST_AVAILABLE:
             "verbose": 0
         }
     }
+
