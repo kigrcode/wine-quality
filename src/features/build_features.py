@@ -9,9 +9,10 @@ import pandas as pd
 def add_domain_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Add project-specific features.
-    This is a placeholder for real feature engineering.
+    Checks key wine quality ratios / combinations.
     """
     df = df.copy()
-    # Example:
-    # df["income_to_age"] = df["income"] / (df["age"] + 1)
+    df["free_so2_ratio"] = df["free sulfur dioxide"] / (df["total sulfur dioxide"] + 0.1)
+    df["total_acidity"] = df["fixed acidity"] + (df["volatile acidity"])
+    df["density_to_alcohol"] = df["density"] / (df["alcohol"] + 0.1)
     return df

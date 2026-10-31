@@ -46,6 +46,7 @@ feature_engineering:
   binning: false           # useful when numeric features have
                            # non-monotonic relationships with target
   aggregations: false      # useful when group statistics carry signal
+  domain_features: false  # apply add_domain_features() from src/features/build_features.py
   polynomial_degree: 2
   max_interaction_pairs: 20
   bin_numeric_cols: []
@@ -55,8 +56,8 @@ feature_engineering:
 
 # Feature selection
 feature_selection:
-  mi_percentile: 50
-  shap_percentile: 80
+  mi_percentile: 100
+  shap_percentile: 100
 
 # Baseline models
 baseline:
@@ -77,6 +78,8 @@ tuning:
   scoring: "roc_auc"
   models_to_tune:
     - xgboost_classifier
+    - logistic_regression
+
 
 # Threshold tuning
 threshold_tuning:
