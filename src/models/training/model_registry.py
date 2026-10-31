@@ -174,3 +174,17 @@ if CATBOOST_AVAILABLE:
         }
     }
 
+def apply_thread_setting(params, model_class, n_jobs):
+    """Return a copy of params with the thread setting applied, if any."""
+    if n_jobs is None:
+        return params
+
+    new_params = dict(params)
+    name = model_class.__name__
+
+    if "CatBoost" in name:
+        new_params["thread_count"] = n_jobs
+    elif "XGB" in name or "LGBM" in name or "n_jobs" in new_params:
+        new_params["n_jobs"] = n_jobs
+
+    return new_params

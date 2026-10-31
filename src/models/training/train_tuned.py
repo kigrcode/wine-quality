@@ -8,8 +8,10 @@ from rich import print
 import numpy as np
 from sklearn.model_selection import RandomizedSearchCV, cross_val_score
 from sklearn.base import BaseEstimator
+from typing import Optional
+from src.models.training.model_registry import apply_thread_setting
 
-# Optuna is optional — gracefully handled if not installed
+# Optuna is optional
 try:
     import optuna
     optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -49,7 +51,7 @@ def train_random_search(
     n_iter: int,
     scoring: str,
     random_state: int,
-    n_jobs: int = -1,
+    n_jobs: int = 1,
 ) -> RandomizedSearchCV:
     """
     Tune hyperparameters using RandomizedSearchCV.
@@ -88,7 +90,7 @@ def train_optuna(
     n_trials: int,
     scoring: str,
     random_state: int,
-    n_jobs: int = -1,
+    n_jobs: Optional[int] = None
 ):
     """
     Tune hyperparameters using Optuna Bayesian optimisation.
@@ -104,12 +106,13 @@ def train_optuna(
 
     def objective(trial):
         params = param_space_fn(trial)
+        params = apply_thread_setting(params, model_class, n_jobs)
         model = model_class(**params)
         scores = cross_val_score(
             model, X_train, y_train,
             cv=cv,
             scoring=scoring,
-            n_jobs=n_jobs,
+            n_jobs=1,
         )
         return scores.mean()
 
@@ -185,6 +188,7 @@ def run_tuning(
             n_trials=n_trials,
             scoring=scoring,
             random_state=random_state,
+            n_jobs=(config.get("n_jobs")),
         )
 
     else:
