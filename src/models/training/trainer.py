@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 
 from sklearn.model_selection import KFold, StratifiedKFold
-
 from src.models.training.model_registry import MODEL_REGISTRY
+from src.models.training.model_registry import apply_thread_setting
 from src.models.training.validation import validate_param_overrides
 from src.models.training.metrics import (
     compute_classification_metrics,
@@ -99,12 +99,7 @@ class ModelTrainer:
 
             validate_param_overrides(model_class, overrides)
             params = {**default_params, **overrides}
-            if self.n_jobs is not None:
-                if self._is_catboost_model(model_name):
-                    params["thread_count"] = self.n_jobs
-                elif "n_jobs" in params or self._is_lightgbm_model(model_name):
-                    params["n_jobs"] = self.n_jobs
-
+            params = apply_thread_setting(params, model_class, self.n_jobs)
             print(f"\nTraining: {model_name}")
 
             cv_metrics, train_time = self._cross_validate_model(
