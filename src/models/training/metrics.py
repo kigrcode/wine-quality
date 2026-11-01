@@ -24,6 +24,7 @@ def compute_classification_metrics(y_true, y_proba, y_pred) -> Dict[str, float]:
     y_pred: predicted class labels
     """
     metrics: Dict[str, float] = {}
+    avg = "binary" if len(np.unique(y_true)) == 2 else "macro"
 
     # ROC-AUC
     try:
@@ -36,19 +37,19 @@ def compute_classification_metrics(y_true, y_proba, y_pred) -> Dict[str, float]:
 
     # F1
     try:
-        metrics["f1"] = f1_score(y_true, y_pred, average="macro")
+        metrics["f1"] = f1_score(y_true, y_pred, average=avg)
     except Exception:
         metrics["f1"] = np.nan
 
     # Precision
     try:
-        metrics["precision"] = precision_score(y_true, y_pred, average="macro", zero_division=0)
+        metrics["precision"] = precision_score(y_true, y_pred, average=avg, zero_division=0)
     except Exception:
         metrics["precision"] = np.nan
 
     # Recall
     try:
-        metrics["recall"] = recall_score(y_true, y_pred, average="macro", zero_division=0)
+        metrics["recall"] = recall_score(y_true, y_pred, average=avg, zero_division=0)
     except Exception:
         metrics["recall"] = np.nan
 
