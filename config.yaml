@@ -109,4 +109,11 @@ feature_type_overrides:
 # On small datasets, too many threads can be much slower, e.g. 60s vs 0.1s on
 # ~1,000 rows. Lower this on machines with few cores.
 
-n_jobs: 4    
+n_jobs: 4
+
+
+
+error_analysis:
+  confidence_bins: [0, 0.2, 0.35, 0.5, 0.65, 0.8, 1.0]
+  confident_margin: 0.2        # wrong calls beyond this distance from 0.5 count as confident
+  group_column: quality        # a raw column kept out of the features; null to skip
