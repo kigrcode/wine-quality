@@ -78,7 +78,6 @@ tuning:
   scoring: "roc_auc"
   models_to_tune:
     - xgboost_classifier
-    - logistic_regression
 
 
 # Threshold tuning
