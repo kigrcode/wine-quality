@@ -23,3 +23,8 @@ def error_rate_by_bands(table, bins):
     result = table.groupby("band", observed=False)["wrong"].agg(["mean", "count"])
     result = result.rename(columns={"mean": "error_rate", "count": "n"})
     return result
+
+def confident_errors(table, margin):
+    """Return the wrong rows whose probability is within `margin` of 0 or 1."""
+    mask = table["wrong"] & ((table["proba"] > 1- margin)    | (table["proba"] < margin))
+    return table[mask].copy()
