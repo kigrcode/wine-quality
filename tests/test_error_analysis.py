@@ -2,8 +2,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.analysis.error_analysis import build_error_table, error_rate_by_bands
-from src.analysis.error_analysis import build_error_table, error_rate_by_bands, confident_errors
+
+from src.analysis.error_analysis import build_error_table, error_rate_by_bands, confident_errors, aligned_column
+from sklearn.model_selection import train_test_split
+from src.data.load_data import prepare_data
 
 
 @pytest.fixture
@@ -93,3 +95,63 @@ def test_confident_errors_does_not_modify_input(mixed_table):
     before = mixed_table.copy()
     confident_errors(mixed_table, margin=0.2)
     pd.testing.assert_frame_equal(mixed_table, before)
+
+
+def make_df(n=40, n_dupes=0):
+    good = [i % 2 for i in range(n)]
+    df = pd.DataFrame({"feat": range(n), "twin": good, "good": good})
+    if n_dupes:
+        df = pd.concat([df, df.head(n_dupes)], ignore_index=True)
+    return df
+
+
+def make_config(drop_dupes):
+    return {
+        "target": "good",
+        "drop_columns": ["twin"],
+        "drop_dupes": drop_dupes,
+        "split": {"test_size": 0.25, "random_state": 42, "stratify": True},
+    }
+
+
+def reference_train_target(df, config):
+    """What the pipeline's own split gives for the training target."""
+    X, y = prepare_data(df, config)
+    s = config["split"]
+    _, _, y_tr, _ = train_test_split(
+        X, y, test_size=s["test_size"], random_state=s["random_state"], stratify=y
+    )
+    return y_tr
+
+
+def test_aligned_column_has_training_set_length():
+    result = aligned_column(make_df(), make_config(drop_dupes=False), "twin")
+    assert len(result) == 30  # 75% of 40 rows
+
+
+def test_aligned_column_matches_pipeline_split_row_for_row():
+    df, config = make_df(), make_config(drop_dupes=False)
+    result = aligned_column(df, config, "twin")
+    # "twin" is a copy of the target, so it must equal the pipeline's training target
+    assert result.tolist() == reference_train_target(df, config).tolist()
+
+
+def test_aligned_column_follows_duplicate_drop():
+    df, config = make_df(n_dupes=4), make_config(drop_dupes=True)  # 44 rows, 40 unique
+    result = aligned_column(df, config, "twin")
+    assert len(result) == 30
+    assert result.tolist() == reference_train_target(df, config).tolist()
+
+
+def test_aligned_column_keeps_duplicates_when_not_dropping():
+    df, config = make_df(n_dupes=4), make_config(drop_dupes=False)
+    result = aligned_column(df, config, "twin")
+    assert len(result) == 33  # 75% of 44 rows
+    assert result.tolist() == reference_train_target(df, config).tolist()
+
+
+def test_aligned_column_does_not_modify_input():
+    df = make_df(n_dupes=4)
+    before = df.copy()
+    aligned_column(df, make_config(drop_dupes=True), "twin")
+    pd.testing.assert_frame_equal(df, before)
