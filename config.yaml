@@ -117,3 +117,4 @@ error_analysis:
   confidence_bins: [0, 0.2, 0.35, 0.5, 0.65, 0.8, 1.0]
   confident_margin: 0.2        # wrong calls beyond this distance from 0.5 count as confident
   group_column: quality        # a raw column kept out of the features; null to skip
+
